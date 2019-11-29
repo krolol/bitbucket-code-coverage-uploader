@@ -1,6 +1,10 @@
 ﻿using CommandLine;
+using CoverageUploader.Converters;
+using CoverageUploader.Coverage;
 using CoverageUploader.Rest;
+using Newtonsoft.Json;
 using System;
+using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -33,8 +37,9 @@ namespace CoverageUploader
 		{
 			try
 			{
+				JSONCoverage jsonCoverage = CoberturaConverter.ConvertFromCobertura(arguments.CoverageFile);
 				var client = new Client(arguments.BitbucketURL, arguments.Username, arguments.Password);
-				var responseMessage = client.PostCoverageAsync(arguments.CommidID, "{\"file\"}");
+				var responseMessage = client.PostCoverageAsync(arguments.CommidID, jsonCoverage.ConvertToJson());
 				Console.WriteLine(responseMessage.Result.ToString());
 				return 0;
 			}
