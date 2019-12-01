@@ -1,5 +1,6 @@
 ﻿using CoverageUploader.Coverage;
 using System.Xml;
+using LibGit2Sharp;
 
 namespace CoverageUploader.Converters
 {
@@ -15,7 +16,7 @@ namespace CoverageUploader.Converters
 			xmlDocument.Load(pathToCoverageFile);
 			foreach (XmlNode xmlNode in xmlDocument.SelectNodes(_pathToClass))
 			{
-				string fileName = xmlNode.Attributes["filename"].Value;
+				string fileName = Help.GetRelativeFilePath(xmlNode.Attributes["filename"].Value);
 				FileCoverage fileCoverage = new FileCoverage(fileName);
 				var a = xmlNode.SelectNodes(_pathToLine).Count;
 				foreach (XmlNode node in xmlNode.SelectNodes(_pathToLine))
