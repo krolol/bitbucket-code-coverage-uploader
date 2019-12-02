@@ -12,17 +12,16 @@ namespace CoverageUploader.Converters
 		private const string _pathToLine = "lines/line";
 		private const string _pathToSource = "coverage/sources/source";
 
-		public static JSONCoverage ConvertFromCobertura(string pathToCoverageFile)
+		public static JSONCoverage ConvertFromCobertura(string pathToCoverageFile, string repoRoot)
 		{
 			JSONCoverage jsonCoverage = new JSONCoverage();
 			XmlDocument xmlDocument = new XmlDocument();
 			xmlDocument.Load(pathToCoverageFile);
-			XmlNode sourceNode = xmlDocument.SelectSingleNode(_pathToSource);
-			string source = string.Equals(sourceNode.Value, null) ? string.Empty : sourceNode.Value;
+			string source = xmlDocument.SelectSingleNode(_pathToSource).InnerText;
+			repoRoot = string.Equals(repoRoot, null) ? string.Empty : repoRoot;
 			foreach (XmlNode xmlNode in xmlDocument.SelectNodes(_pathToClass))
 			{
-				Console.WriteLine(Path.Combine(source, xmlNode.Attributes["filename"].Value));
-				string fileName = Help.GetRelativeFilePath(Path.Combine(source, xmlNode.Attributes["filename"].Value));
+				string fileName = Help.GetRelativeFilePath(Path.Combine(source, xmlNode.Attributes["filename"].Value), repoRoot);
 				FileCoverage fileCoverage = new FileCoverage(fileName);
 				var a = xmlNode.SelectNodes(_pathToLine).Count;
 				foreach (XmlNode node in xmlNode.SelectNodes(_pathToLine))

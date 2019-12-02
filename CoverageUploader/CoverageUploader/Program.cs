@@ -22,25 +22,19 @@ namespace CoverageUploader
 		public string BitbucketURL { get; set; }
 		[Option('f', "coverage.file", Required = true, HelpText = "Path to coverage file")]
 		public string CoverageFile { get; set; }
+		[Option('r', "repository.root", Required = false, HelpText = "Path to repository root folder")]
+		public string RepositoryRoot { get; set; }
 
 	}
 	class Program
 	{
 		static int Main(string[] args)
 		{
-			Parser.Default.ParseArguments<Arguments>(args)
-				.WithParsed(arguments => RunArguments(arguments));
-			return -1;
-		}
-
-		private static int RunArguments(Arguments arguments)
-		{
 			try
 			{
-				JSONCoverage jsonCoverage = CoberturaConverter.ConvertFromCobertura(arguments.CoverageFile);
-				var client = new Client(arguments.BitbucketURL, arguments.Username, arguments.Password);
-				var responseMessage = client.PostCoverageAsync(arguments.CommidID, jsonCoverage.ConvertToJson());
-				Console.WriteLine(responseMessage.Result.ToString());
+				args = new string[] { "-u", "5", "-p", "2", "-c", "3", "-b", "4", "-f", "D:\\ServerUnitTests.xml" };
+				Parser.Default.ParseArguments<Arguments>(args)
+					.WithParsed(arguments => RunArguments(arguments));
 				return 0;
 			}
 			catch(Exception e)
@@ -48,6 +42,14 @@ namespace CoverageUploader
 				Console.WriteLine(e);
 				return -1;
 			}
+		}
+
+		private static void RunArguments(Arguments arguments)
+		{
+			JSONCoverage jsonCoverage = CoberturaConverter.ConvertFromCobertura(arguments.CoverageFile, arguments.RepositoryRoot);
+			var client = new Client(arguments.BitbucketURL, arguments.Username, arguments.Password);
+			var responseMessage = client.PostCoverageAsync(arguments.CommidID, jsonCoverage.ConvertToJson());
+			Console.WriteLine(responseMessage.Result.ToString());
 		}
 	}
 }
