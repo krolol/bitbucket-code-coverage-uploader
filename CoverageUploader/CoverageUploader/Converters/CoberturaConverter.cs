@@ -32,7 +32,7 @@ namespace CoverageUploader.Converters
 					{
 						if (bool.Parse(node.Attributes["branch"].Value))
 						{
-							if (int.Parse(node.Attributes["condition-coverage"].Value.Split('%')[0]) < 100)
+							if (double.Parse(node.Attributes["condition-coverage"].Value.Split('%')[0]) < 100)
 							{
 								fileCoverage.PartialCoveredLines.Add(lineNumber);
 								continue;
